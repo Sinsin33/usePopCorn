@@ -50,27 +50,84 @@ const tempWatchedData = [
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
+const key = "4463230a";
 
 export default function App() {
-  const [movies, setMovies] = useState(tempMovieData);
+  const [query, setQuery] = useState("");
+  const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState(tempWatchedData);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [page, setPage] = useState(1);
+  const tempQuerry = "superman";
 
-  useEffect(function () {
-    fetch(`http://www.omdbapi.com/?apikey=4463230a&s=superman`)
-      .then((res) => res.json())
-      .then((data) => setMovies(data.Search));
-  }, []);
+  useEffect(
+    function () {
+      async function fetchMovies() {
+        try {
+          setIsLoading(true);
+          const res = await fetch(
+            `http://www.omdbapi.com/?apikey=${key}&s=${query}`
+          );
+          if (!res.ok) throw new Error("something went wrong");
+          const data = await res.json();
+          setMovies(data.Search || []);
+        } catch (er) {
+          console.log(er);
+          setError(er.message);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+
+      fetchMovies();
+    },
+    [query]
+  );
+  const fetchMoreMovies = async (page) => {
+    try {
+      const res = await fetch(
+        `http://www.omdbapi.com/?apikey=${key}&s=${query}&page=${page}`
+      );
+
+      if (!res.ok) throw new Error("Something went wrong");
+
+      const data = await res.json();
+
+      if (data.Response === "True") {
+        setMovies((prevMovies) => [...prevMovies, ...data.Search]);
+        setPage(page + 1);
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   return (
     <>
       <Nav>
         <Logo />
-        <Search />
+        <Search query={query} setQuery={setQuery} />
         <NameResault movies={movies} />
       </Nav>
       <Main>
         <Box>
-          <MovieList movies={movies} />
+          {isLoading ? (
+            <Load />
+          ) : error ? (
+            <Error error={error} />
+          ) : (
+            <>
+              <MovieList movies={movies} />
+              {movies.length !== 0 ? (
+                <button onClick={() => fetchMoreMovies()}>Show More</button>
+              ) : (
+                ""
+              )}
+            </>
+          )}
         </Box>
+
         <Box>
           <WatchedSummary watched={watched} />
           <WatchedMoviesList watched={watched} />
@@ -79,6 +136,24 @@ export default function App() {
     </>
   );
 }
+
+const Error = function ({ error }) {
+  return (
+    <>
+      <p className="loader"> {error}</p>
+    </>
+  );
+};
+const Load = function () {
+  return (
+    <>
+      <div className="spinnerWrapper">
+        <span className="loaderSpinner"></span>
+        <p className="loader">loading</p>
+      </div>
+    </>
+  );
+};
 const Nav = function ({ children }) {
   return <nav className="nav-bar">{children}</nav>;
 };
@@ -90,9 +165,7 @@ const Logo = function () {
     </div>
   );
 };
-const Search = function () {
-  const [query, setQuery] = useState("");
-
+const Search = function ({ query, setQuery }) {
   return (
     <input
       className="search"
