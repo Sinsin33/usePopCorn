@@ -63,35 +63,48 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  height: 100px;
   margin-top: 4rem;
 }
 
-.loaderSpinner {
+.loader {
   width: 48px;
   height: 48px;
-  border: 5px solid #fff;
-  border-bottom-color: transparent;
-  border-radius: 50%;
   display: inline-block;
+  position: relative;
+  border-width: 3px 2px 3px 2px;
+  border-style: solid dotted solid dotted;
+  border-color: #de3500 rgba(255, 255, 255, 0.3) #fff rgba(151, 107, 93, 0.3);
+  border-radius: 50%;
   box-sizing: border-box;
-  animation: rotation 1s linear infinite;
-  margin-bottom: 1rem;
+  animation: 1s rotate linear infinite;
+}
+.loader:before,
+.loader:after {
+  content: "";
+  top: 0;
+  left: 0;
+  position: absolute;
+  border: 10px solid transparent;
+  border-bottom-color: #fff;
+  transform: translate(-10px, 19px) rotate(-35deg);
+}
+.loader:after {
+  border-color: #de3500 #0000 #0000 #0000;
+  transform: translate(32px, 3px) rotate(-35deg);
+}
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
-.loader {
+.loaderP {
   text-transform: uppercase;
   font-size: 1.5rem;
   font-weight: 600;
   text-align: center;
-}
-
-@keyframes rotation {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  margin-top: 5rem;
 }
 
 .error {
@@ -146,6 +159,11 @@ body {
   justify-self: end;
   font-size: 1.8rem;
 }
+.total-results {
+  display: block;
+  font-size: 1.4rem;
+  color: #eae6e6;
+}
 
 .btn-toggle {
   position: absolute;
@@ -181,9 +199,11 @@ body {
   column-gap: 2.4rem;
   font-size: 1.6rem;
   align-items: center;
-
   padding: 1.6rem 3.2rem;
   border-bottom: 1px solid var(--color-background-100);
+}
+.list li:hover {
+  background-color: #343a40;
 }
 
 .list.list-movies li {
@@ -202,6 +222,7 @@ body {
 
 .list h3 {
   font-size: 1.8rem;
+  cursor: pointer;
 }
 
 .list div {
@@ -376,6 +397,86 @@ body {
 .box,
 .list {
   scrollbar-width: none; /* Firefox */
+}
+.movie-details {
+  position: relative; /* so close button can sit in the corner */
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  padding: 2rem;
+  background-color: #1c1c1c; /* match your dark theme */
+  border-radius: 1.2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  animation: fadeIn 0.3s ease;
+}
+
+.movie-details h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #fff;
+}
+
+.movie-details img {
+  width: 180px;
+  height: auto;
+  border-radius: 0.6rem;
+  align-self: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.movie-details p {
+  font-size: 1.4rem;
+  line-height: 1.6;
+  color: #ddd;
+}
+
+.movie-details strong {
+  color: #ffcc00; /* highlight important fields */
+}
+
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  border: none;
+  background: transparent;
+  font-size: 2.2rem;
+  cursor: pointer;
+  color: #aaa;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.close-btn:hover {
+  transform: scale(1.2);
+  color: #fff;
+}
+.delete-btn {
+  position: absolute;
+  top: 3rem;
+  right: 1rem;
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #aaa;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.delete-btn:hover {
+  transform: scale(1.2);
+  color: #fff;
+}
+/* smooth fade in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /*
